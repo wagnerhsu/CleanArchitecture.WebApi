@@ -3,9 +3,6 @@ using Application.Wrappers;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,10 +15,12 @@ namespace Application.Features.Products.Commands.CreateProduct
         public string Description { get; set; }
         public decimal Rate { get; set; }
     }
+
     public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand, Response<int>>
     {
         private readonly IProductRepositoryAsync _productRepository;
         private readonly IMapper _mapper;
+
         public CreateProductCommandHandler(IProductRepositoryAsync productRepository, IMapper mapper)
         {
             _productRepository = productRepository;

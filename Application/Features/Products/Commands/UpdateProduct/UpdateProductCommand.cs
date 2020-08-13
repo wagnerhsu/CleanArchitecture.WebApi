@@ -2,9 +2,6 @@
 using Application.Interfaces.Repositories;
 using Application.Wrappers;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -17,13 +14,16 @@ namespace Application.Features.Products.Commands.UpdateProduct
         public string Barcode { get; set; }
         public string Description { get; set; }
         public decimal Rate { get; set; }
+
         public class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand, Response<int>>
         {
             private readonly IProductRepositoryAsync _productRepository;
+
             public UpdateProductCommandHandler(IProductRepositoryAsync productRepository)
             {
                 _productRepository = productRepository;
             }
+
             public async Task<Response<int>> Handle(UpdateProductCommand command, CancellationToken cancellationToken)
             {
                 var product = await _productRepository.GetByIdAsync(command.Id);

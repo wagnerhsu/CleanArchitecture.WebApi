@@ -2,11 +2,7 @@
 using Domain.Common;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,11 +11,13 @@ namespace Infrastructure.Persistence.Contexts
     public class ApplicationDbContext : DbContext
     {
         private readonly IDateTimeService _dateTime;
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IDateTimeService dateTime) : base(options)
         {
             ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
             _dateTime = dateTime;
         }
+
         public DbSet<Product> Products { get; set; }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
@@ -31,6 +29,7 @@ namespace Infrastructure.Persistence.Contexts
                     case EntityState.Added:
                         entry.Entity.Created = _dateTime.NowUtc;
                         break;
+
                     case EntityState.Modified:
                         entry.Entity.LastModified = _dateTime.NowUtc;
                         break;
@@ -38,6 +37,7 @@ namespace Infrastructure.Persistence.Contexts
             }
             return base.SaveChangesAsync(cancellationToken);
         }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             //All Decimals will have 18,6 Range

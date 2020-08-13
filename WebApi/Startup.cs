@@ -1,7 +1,5 @@
 using Application;
-using Application.Wrappers;
 using Domain.Settings;
-using FluentValidation.AspNetCore;
 using Infrastructure.Identity;
 using Infrastructure.Persistence;
 using Infrastructure.Shared;
@@ -13,7 +11,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using System;
-using System.Linq;
 using WebApi.Middlewares;
 
 namespace WebApi
@@ -21,6 +18,7 @@ namespace WebApi
     public class Startup
     {
         public IConfiguration _config { get; }
+
         public Startup(IConfiguration configuration)
         {
             _config = configuration;
@@ -29,13 +27,14 @@ namespace WebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            
             services.AddApplicationLayer();
             services.AddIdentityInfrastructure(_config);
             services.AddPersistenceInfrastructure(_config);
             services.AddSharedInfrastructure(_config);
             services.AddControllers();
+
             #region Swagger
+
             services.AddSwaggerGen(c =>
             {
                 c.IncludeXmlComments(string.Format(@"{0}\CleanArchitecture.WebApi.xml", System.AppDomain.CurrentDomain.BaseDirectory));
@@ -62,19 +61,23 @@ namespace WebApi
                 });
             });
             services.Configure<JWTSettings>(_config.GetSection("JWTSettings"));
-            #endregion
+
+            #endregion Swagger
+
             #region Api Versioning
+
             // Add API Versioning to the Project
             services.AddApiVersioning(config =>
             {
                 // Specify the default API Version as 1.0
                 config.DefaultApiVersion = new ApiVersion(1, 0);
-                // If the client hasn't specified the API version in the request, use the default API version number 
+                // If the client hasn't specified the API version in the request, use the default API version number
                 config.AssumeDefaultVersionWhenUnspecified = true;
                 // Advertise the API versions supported for the particular endpoint
                 config.ReportApiVersions = true;
             });
-            #endregion
+
+            #endregion Api Versioning
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -95,7 +98,9 @@ namespace WebApi
             app.UseRouting();
 
             app.UseAuthorization();
+
             #region Swagger
+
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
             // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
@@ -104,7 +109,9 @@ namespace WebApi
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "CleanArchitecture.WebApi");
             });
-            #endregion
+
+            #endregion Swagger
+
             // global error handler
             app.UseMiddleware<ErrorHandlerMiddleware>();
             app.UseEndpoints(endpoints =>

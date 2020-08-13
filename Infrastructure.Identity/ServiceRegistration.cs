@@ -26,9 +26,12 @@ namespace Infrastructure.Identity
                     b => b.MigrationsAssembly(typeof(IdentityContext).Assembly.FullName)));
             }
             services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<IdentityContext>().AddDefaultTokenProviders();
+
             #region Services
+
             services.AddTransient<IAccountService, AccountService>();
-            #endregion
+
+            #endregion Services
         }
     }
 }
