@@ -6,6 +6,7 @@ using Domain.Settings;
 using Infrastructure.Identity.Helpers;
 using Infrastructure.Identity.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -18,7 +19,10 @@ using System.Net.Cache;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using Application.Enums;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Primitives;
+using Application.DTOs.Email;
 
 namespace Infrastructure.Identity.Services
 {
@@ -32,14 +36,14 @@ namespace Infrastructure.Identity.Services
         private readonly IDateTimeService _dateTimeService;
         public AccountService(UserManager<ApplicationUser> userManager, 
             RoleManager<IdentityRole> roleManager, 
-            IOptions<JWTSettings> options, 
+            IOptions<JWTSettings> jwtSettings, 
             IDateTimeService dateTimeService, 
             SignInManager<ApplicationUser> signInManager,
             IEmailService emailService)
         {
             _userManager = userManager;
             _roleManager = roleManager;
-            _jwtSettings = options.Value;
+            _jwtSettings = jwtSettings.Value;
             _dateTimeService = dateTimeService;
             _signInManager = signInManager;
             this._emailService = emailService;
@@ -95,6 +99,7 @@ namespace Infrastructure.Identity.Services
                 var result = await _userManager.CreateAsync(user, request.Password);
                 if (result.Succeeded)
                 {
+                    await _userManager.AddToRoleAsync(user, Roles.Basic.ToString());
                     var verificationUri = await SendVerificationEmail(user, origin);
                     //TODO: Attach Email Service here and configure it via appsettings
                     await _emailService.SendAsync(new Application.DTOs.Email.EmailRequest() { From = "mail@codewithmukesh.com", To = user.Email, Body = $"Please confirm your account by visiting this URL {verificationUri}", Subject = "Confirm Registration" });
@@ -169,11 +174,19 @@ namespace Infrastructure.Identity.Services
             return verificationUri;
         }
 
-        public async Task ConfirmEmailAsync(string userId, string code)
+        public async Task<Response<string>> ConfirmEmailAsync(string userId, string code)
         {
             var user = await _userManager.FindByIdAsync(userId);
             code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
             var result = await _userManager.ConfirmEmailAsync(user, code);
+            if(result.Succeeded)
+            {
+                return new Response<string>(user.Id, message: $"Account Confirmed for {user.Email}. You can now use the /api/Account/authenticate endpoint.");
+            }
+            else
+            {
+                throw new ApiException($"An error occured while confirming {user.Email}.");
+            }
         }
 
         private RefreshToken GenerateRefreshToken(string ipAddress)
@@ -185,6 +198,40 @@ namespace Infrastructure.Identity.Services
                 Created = DateTime.UtcNow,
                 CreatedByIp = ipAddress
             };
+        }
+
+        public async Task ForgotPassword(ForgotPasswordRequest model, string origin)
+        {
+            var account = await _userManager.FindByEmailAsync(model.Email);
+
+            // always return ok response to prevent email enumeration
+            if (account == null) return;
+
+            var code = await _userManager.GeneratePasswordResetTokenAsync(account);
+            var route = "api/account/reset-password/";
+            var _enpointUri = new Uri(string.Concat($"{origin}/", route));
+            var emailRequest = new EmailRequest()
+            {
+                Body = $"You reset token is - {code}",
+                To = model.Email,
+                Subject = "Reset Password",
+            };
+            await _emailService.SendAsync(emailRequest);
+        }
+
+        public async Task<Response<string>> ResetPassword(ResetPasswordRequest model)
+        {
+            var account = await _userManager.FindByEmailAsync(model.Email);
+            if (account == null) throw new ApiException($"No Accounts Registered with {model.Email}.");
+            var result = await _userManager.ResetPasswordAsync(account, model.Token, model.Password);
+            if(result.Succeeded)
+            {
+                return new Response<string>(model.Email, message: $"Password Resetted.");
+            }
+            else
+            {
+                throw new ApiException($"Error occured while reseting the password.");
+            }
         }
     }
 

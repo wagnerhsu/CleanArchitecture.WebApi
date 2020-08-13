@@ -33,8 +33,19 @@ namespace WebApi.Controllers
         public async Task<IActionResult> ConfirmEmailAsync([FromQuery]string userId, [FromQuery]string code)
         {
             var origin = Request.Headers["origin"];
-            await _accountService.ConfirmEmailAsync(userId, code);
+            return Ok(await _accountService.ConfirmEmailAsync(userId, code));
+        }
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordRequest model)
+        {
+            await _accountService.ForgotPassword(model, Request.Headers["origin"]);
             return Ok();
+        }
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword(ResetPasswordRequest model)
+        {
+            
+            return Ok(await _accountService.ResetPassword(model));
         }
         private string GenerateIPAddress()
         {

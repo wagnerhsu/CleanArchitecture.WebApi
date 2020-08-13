@@ -1,8 +1,23 @@
-# Clean Architecture with ASP.NET Core 3.1 WebApi
+ # ASP.NET Core WebApi - Clean Architecture
+
+![.NET Core](https://github.com/iammukeshm/CleanArchitecture.WebApi/workflows/.NET%20Core/badge.svg?branch=master)
+![GitHub stars](https://img.shields.io/github/stars/iammukeshm/CleanArchitecture.WebApi)
+[![Twitter Follow](https://img.shields.io/twitter/follow/codewithmukesh?style=social&label=follow)](https://twitter.com/codewithmukesh)
+
+<br/>
 
 An Implementation of Clean Architecture with ASP.NET Core 3.1 WebApi. With this Open-Source BoilerPlate Template, you will get access to the world of Loosely-Coupled and Inverted-Dependency Architecture in ASP.NET Core 3.1 WebApi with a lot of best practices.
 
 Check out the [Project Page](https://www.codewithmukesh.com/project/clean-architecture-with-aspnet-core-webapi/) to learn more about this Open Source Project.
+
+## Upcoming Release 
+
+### v1.1-release 
+
+Read the [Changelog file](https://github.com/iammukeshm/CleanArchitecture.WebApi/blob/master/CHANGELOG.md) to see the new changes.
+
+Clone this repository to get the latest unreleased version.
+
 
 ## Releases
 
@@ -50,20 +65,22 @@ Or, If you are feeling really generous, [Support the Project with a small contri
 - [x] Serilog
 - [x] Swagger UI
 - [x] Response Wrappers
-- [ ] Healthchecks
+- [x] Healthchecks
 - [x] Pagination
+- [ ] In-Memory Caching
 - [ ] Redis Caching
 - [x] In-Memory Database
 - [x] Microsoft Identity with JWT Authentication
-- [ ] Role based Authorization
-- [ ] Identity Seeding
-- [ ] Database Seeding
+- [x] Role based Authorization
+- [x] Identity Seeding
+- [x] Database Seeding
 - [x] Custom Exception Handling Middlewares
 - [x] API Versioning
 - [x] Fluent Validation
 - [x] Automapper
-- [ ] SMPT / Mailkit / Sendgrid Email Service
-- [ ] Complete User Management Module (Register / Generate Token / Forgot Password / Confirmation Mail)
+- [x] SMTP / Mailkit / Sendgrid Email Service
+- [x] Complete User Management Module (Register / Generate Token / Forgot Password / Confirmation Mail)
+- [x] User Auditing
 
 ## Brief Overview
 ![alt text](https://www.codewithmukesh.com/wp-content/uploads/2020/06/Onion-Architecture-In-ASP.NET-Core.png)
